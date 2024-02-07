@@ -24,8 +24,32 @@ jobs:
               aws-region: ${{ secrets.AWS_REGION }}       
 
 
-          - name: sync bucket
-            run: aws s3 sync ./files/ "s3://${{ secrets.AWS_BUCKET_NAME }}/actions-test/" --delete
+          # - name: sync bucket
+          #   run: aws s3 sync ./files/ "s3://${{ secrets.AWS_BUCKET_NAME }}/actions-test/" --delete
+
+
+          - name: Setup Terraform
+            uses: hashicorp/setup-terraform@v3
+            with:
+              terraform_version: 1.7.2
+
+          - name: Terraform init
+            run: terraform init
+
+          - name: Terraform fmt
+            id: fmt
+            run: terraform fmt -check
+            continue-on-error: true
+          
+          - name: Terraform validate
+            run: terraform validate 
+
+          - name: Terraform plan
+            run: terraform plan -no-color
+
+          - name: Terraform apply
+            run: terraform apply -auto-approve -input=false
+
 
 
 
